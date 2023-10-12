@@ -11,10 +11,10 @@ INPUT_FILE_PATH = r".\cleaned_input.csv"
 OUTPUT_FILE_PATH = r".\output.csv"
 
 
-def read_from_file() -> List[Student]:
+def read_from_file(my_path=INPUT_FILE_PATH) -> List[Student]:
     students = []
 
-    with open(INPUT_FILE_PATH, encoding='utf-8') as csvfile:
+    with open(my_path, encoding='utf-8') as csvfile:
         spamreader = csv.reader(csvfile, )
         next(spamreader)
         i = 0
@@ -54,7 +54,7 @@ def to_student(row) -> Student:
 COLS = ["班级"] + STUDENT_COL_TITLE
 
 
-def write_to_file( allocated_classes: List[SchoolClass], path:str=OUTPUT_FILE_PATH):
+def write_to_file(allocated_classes: List[SchoolClass], path: str = OUTPUT_FILE_PATH):
     with open(path, "w", newline='', encoding='utf-8-sig') as csvfile:
         writer = csv.writer(csvfile, )
         writer.writerow(COLS)
