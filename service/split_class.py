@@ -1,7 +1,7 @@
 import logging
 from collections import defaultdict
 from statistics import mean
-from typing import List
+from typing import List, Tuple
 
 from model.school_class import SchoolClass, MeanClass
 from model.student import Student
@@ -23,6 +23,17 @@ def init_class_split(
         i += 1
         i %= number_of_class
     return result
+
+def filter_students_with_missing_score(students: List[Student]) -> Tuple[List[Student],List[Student]]:
+    # return list(filter(lambda s: s.total != Score.Aplus, students))
+    score_missing_students = []
+    score_presented_students = []
+    for s in students:
+        if s.total is not None and s.sex is not None and s.chinese is not None and s.math is not None and s.english is not None:
+            score_presented_students.append(s)
+        else:
+            score_missing_students.append(s)
+    return score_missing_students, score_presented_students
 
 
 def get_medium_class(student_allocations: List[Student]):

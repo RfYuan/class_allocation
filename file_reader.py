@@ -7,7 +7,7 @@ from model.student import Student, STUDENT_COL_TITLE
 from model.student_attr import score_from_str, to_sex, to_class_type, ExtraType
 
 logger = logging.getLogger(__name__)
-INPUT_FILE_PATH = r".\cleaned_input.csv"
+INPUT_FILE_PATH = r".\input.csv"
 OUTPUT_FILE_PATH = r".\output.csv"
 
 
@@ -24,7 +24,7 @@ def read_from_file(my_path=INPUT_FILE_PATH) -> List[Student]:
                 tmp = to_student(row)
                 students.append(tmp)
             except RuntimeError as e:
-                logger.debug(f"failed to parse row {i}, {row}, with exception {e}")
+                logger.error(f"failed to parse row {i}, {row}, with exception {e}")
     return students
 
 
@@ -41,13 +41,14 @@ def split_student_by_class_type(students: List[Student]):
 
 def to_student(row) -> Student:
     return Student(
-        name=row[2],
-        class_type=to_class_type(row[10]),
-        total=score_from_str(row[4]),
-        chinese=score_from_str(row[5]),
-        math=score_from_str(row[6]),
-        english=score_from_str(row[7]),
-        sex=to_sex(row[9])
+        name=row[1],
+        # class_type=to_class_type(row[10]),
+        class_type=ExtraType.Hard,
+        total=score_from_str(row[3]),
+        chinese=score_from_str(row[4]),
+        math=score_from_str(row[5]),
+        english=score_from_str(row[6]),
+        sex=to_sex(row[2])
     )
 
 

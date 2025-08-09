@@ -4,7 +4,7 @@ from typing import List
 import file_reader
 from model.school_class import SchoolClass, MeanClass
 from service import split_class
-from service.split_class import init_class_split, get_medium_class
+from service.split_class import init_class_split, get_medium_class, filter_students_with_missing_score
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG, format='%(message)s')
@@ -17,9 +17,11 @@ ENGLISH_TOLERANT = 0.3
 def read_all_students():
     students = file_reader.read_from_file()
     hard, medium = file_reader.split_student_by_class_type(students)
+    (hard_score_missing_students, hard) = filter_students_with_missing_score(hard)
+    print([s.name for s in hard_score_missing_students])
 
     hard_class_model = get_medium_class(student_allocations=hard)
-    hard_classes = init_class_split(students=hard, number_of_class=11)
+    hard_classes = init_class_split(students=hard, number_of_class=9)
     logger.info("starting to averaging out sex")
     _avgeraging_out_sex_with_logging(hard_class_model, hard_classes, tolerant=0.07)
     logger.info("starting to averaging out chinese")
@@ -31,17 +33,22 @@ def read_all_students():
     logger.info("Writting to file")
     file_reader.write_to_file(hard_classes, path="卓越班.csv")
 
-    medium_class_model = get_medium_class(student_allocations=medium)
-    medium_classes = init_class_split(students=medium, number_of_class=4)
-    logger.info("starting to averaging out sex")
-    _avgeraging_out_sex_with_logging(medium_class_model, medium_classes, tolerant=0.08)
-    logger.info("starting to averaging out chinese")
-    _avgeraging_out_chinese_with_logging(medium_class_model, medium_classes, tolerant=0.2)
-    logger.info("starting to averaging out english")
-    _avgeraging_out_english_with_logging(medium_class_model, medium_classes, tolerant=0.2)
-    logger.info("精进班\n"+get_classes_info(medium_classes))
-    logger.info("Writting to file")
-    file_reader.write_to_file(medium_classes, path="精进班.csv")
+
+
+    (medium_score_missing_students, medium) = filter_students_with_missing_score(medium)
+    print([s.name for s in medium_score_missing_students])
+    if medium:
+        medium_class_model = get_medium_class(student_allocations=medium)
+        medium_classes = init_class_split(students=medium, number_of_class=4)
+        logger.info("starting to averaging out sex")
+        _avgeraging_out_sex_with_logging(medium_class_model, medium_classes, tolerant=0.08)
+        logger.info("starting to averaging out chinese")
+        _avgeraging_out_chinese_with_logging(medium_class_model, medium_classes, tolerant=0.2)
+        logger.info("starting to averaging out english")
+        _avgeraging_out_english_with_logging(medium_class_model, medium_classes, tolerant=0.2)
+        logger.info("精进班\n"+get_classes_info(medium_classes))
+        logger.info("Writting to file")
+        file_reader.write_to_file(medium_classes, path="精进班.csv")
 
 
 def get_classes_info(classes: List[SchoolClass])->str:
